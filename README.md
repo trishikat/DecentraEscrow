@@ -87,6 +87,7 @@ Run the complete test suite with:
 
 ```bash
 npx hardhat test
+```
 
 ## Running Locally
 
@@ -96,11 +97,15 @@ From the project root:
 
 ```bash
 npm install
+```
 
 ### 2. Start the local Hardhat blockchain
 
 ```bash
 npx hardhat node
+```
+
+Keep this terminal running.
 
 ### 3. Deploy the escrow contract
 
@@ -112,9 +117,9 @@ The seller address must be supplied when deploying the contract, and the escrow 
 
 Add the local Hardhat network to MetaMask:
 
-- Network: `Hardhat Local`
-- RPC URL: `http://127.0.0.1:8545/`
-- Chain ID: `31337`
+- **Network:** `Hardhat Local`
+- **RPC URL:** `http://127.0.0.1:8545/`
+- **Chain ID:** `31337`
 
 Import one of the Hardhat test accounts into MetaMask if required.
 
@@ -128,6 +133,9 @@ Open another terminal:
 cd frontend
 npm install
 npm run dev
+```
+
+Then open the local Vite URL shown in the terminal.
 
 ## Frontend
 
@@ -138,4 +146,4 @@ The React frontend provides:
 - Escrow balance lookup
 - Release funds interaction
 
-The frontend communicates with the deployed `DecentraEscrow` contract through ethers.js.
+The frontend communicates with the deployed `DecentraEscrow` contract through `ethers.js`.
