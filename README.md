@@ -1,57 +1,141 @@
-# Sample Hardhat 3 Project (`mocha` and `ethers`)
+# DecentraEscrow
 
-This project showcases a Hardhat 3 project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+A local Ethereum escrow dApp that allows a buyer to securely lock ETH in a smart contract and release or refund the funds according to the escrow state.
 
-To learn more about Hardhat 3, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3](https://hardhat.org/hardhat3-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+## Overview
 
-## Project Overview
+DecentraEscrow demonstrates how a blockchain-based escrow workflow can be implemented using Solidity, Hardhat, ethers.js, MetaMask, and React.
 
-This example project includes:
+The smart contract:
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+- Stores ETH in an escrow contract.
+- Records the buyer and seller addresses.
+- Allows only the buyer to release funds to the seller.
+- Allows only the buyer to request a refund.
+- Tracks the escrow lifecycle using explicit contract states.
+- Prevents release or refund after the escrow has already been completed.
 
-## Usage
+The project currently runs entirely on a local Hardhat blockchain using test ETH.
 
-### Running Tests
+## Features
 
-To run all the tests in the project, execute the following command:
+- Buyer and seller address management
+- ETH escrow funding during contract deployment
+- Buyer-controlled fund release
+- Buyer-controlled refund
+- Escrow status tracking
+- Escrow balance checking
+- MetaMask wallet connection
+- React frontend
+- Automated Solidity/TypeScript tests
 
-```shell
+## Tech Stack
+
+- Solidity
+- Hardhat 3
+- ethers.js
+- TypeScript
+- React
+- Vite
+- MetaMask
+- Chai
+
+## Smart Contract
+
+The main contract is:
+
+`contracts/DecentraEscrow.sol`
+
+The escrow has four possible states:
+
+- `Created`
+- `Funded`
+- `Released`
+- `Refunded`
+
+The contract is funded when it is deployed with ETH.
+
+### Release
+
+Only the buyer can call `releaseFunds()`.
+
+When released:
+
+1. The escrow status changes to `Released`.
+2. The escrowed ETH is transferred to the seller.
+
+### Refund
+
+Only the buyer can call `refundBuyer()`.
+
+When refunded:
+
+1. The escrow status changes to `Refunded`.
+2. The escrowed ETH is returned to the buyer.
+
+## Testing
+
+The project includes automated tests covering:
+
+- Escrow creation and funding
+- Buyer-controlled fund release
+- Buyer refund
+- Unauthorized release attempts
+- Unauthorized refund attempts
+
+Run the complete test suite with:
+
+```bash
 npx hardhat test
-```
 
-You can also selectively run the Solidity or `mocha` tests:
+## Running Locally
 
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
-```
+### 1. Install dependencies
 
-### Make a deployment to Sepolia
+From the project root:
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+```bash
+npm install
 
-To run the deployment to a local chain:
+### 2. Start the local Hardhat blockchain
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
+```bash
+npx hardhat node
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+### 3. Deploy the escrow contract
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+Use the project's deployment script with the local Hardhat network.
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+The seller address must be supplied when deploying the contract, and the escrow is funded with local test ETH.
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
+### 4. Configure MetaMask
 
-After setting the variable, you can run the deployment with the Sepolia network:
+Add the local Hardhat network to MetaMask:
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+- Network: `Hardhat Local`
+- RPC URL: `http://127.0.0.1:8545/`
+- Chain ID: `31337`
+
+Import one of the Hardhat test accounts into MetaMask if required.
+
+**Never use a real wallet private key or real ETH for this local setup.**
+
+### 5. Start the frontend
+
+Open another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+
+## Frontend
+
+The React frontend provides:
+
+- MetaMask connection
+- Connected account display
+- Escrow balance lookup
+- Release funds interaction
+
+The frontend communicates with the deployed `DecentraEscrow` contract through ethers.js.
