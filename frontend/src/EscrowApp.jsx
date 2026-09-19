@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ethers } from "ethers";
 import escrowABI from "./escrowABI";
+import "./App.css";
 
 const CONTRACT_ADDRESS = "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e";
 
@@ -29,6 +30,7 @@ function EscrowApp() {
                 setStatus("Please install MetaMask");
                 return;
             }
+
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
 
@@ -44,7 +46,9 @@ function EscrowApp() {
             setStatus("Funds released successfully");
             setEscrowStatus("Released");
         } catch (error) {
-            setStatus("Release failed: " + (error.reason || error.message));
+            setStatus(
+                "Release failed: " + (error.reason || error.message)
+            );
         }
     }
 
@@ -54,6 +58,7 @@ function EscrowApp() {
                 setStatus("Please install MetaMask");
                 return;
             }
+
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
 
@@ -69,7 +74,9 @@ function EscrowApp() {
             setStatus("Funds refunded successfully");
             setEscrowStatus("Refunded");
         } catch (error) {
-            setStatus("Refund failed: " + (error.reason || error.message));
+            setStatus(
+                "Refund failed: " + (error.reason || error.message)
+            );
         }
     }
 
@@ -77,6 +84,7 @@ function EscrowApp() {
         if (!window.ethereum) return;
 
         const provider = new ethers.BrowserProvider(window.ethereum);
+
         const contract = new ethers.Contract(
             CONTRACT_ADDRESS,
             escrowABI,
@@ -84,6 +92,7 @@ function EscrowApp() {
         );
 
         const contractBalance = await contract.getBalance();
+
         setBalance(ethers.formatEther(contractBalance));
     }
 
@@ -91,6 +100,7 @@ function EscrowApp() {
         if (!window.ethereum) return;
 
         const provider = new ethers.BrowserProvider(window.ethereum);
+
         const contract = new ethers.Contract(
             CONTRACT_ADDRESS,
             escrowABI,
@@ -103,41 +113,116 @@ function EscrowApp() {
             "Created",
             "Funded",
             "Released",
-            "Refunded"
+            "Refunded",
         ];
 
         setEscrowStatus(statusNames[Number(currentStatus)]);
     }
 
     return (
-        <div>
+        <div className="app">
             <h1>DecentraEscrow</h1>
 
-            <button onClick={connectWallet}>Connect MetaMask</button>
+            <p className="subtitle">
+                A simple blockchain-based escrow application
+            </p>
 
-            {account && <p>Connected Account: {account}</p>}
+            <div className="wallet-section">
+                <button onClick={connectWallet}>
+                    Connect MetaMask
+                </button>
 
-            <button onClick={getEscrowBalance}>
-                Check Escrow Balance
-            </button>
+                {account && (
+                    <div className="account">
+                        <strong>Connected Account</strong>
+                        <br />
+                        {account}
+                    </div>
+                )}
+            </div>
 
-            <button onClick={getEscrowStatus}>
-                Check Escrow Status
-            </button>
+            <div className="info-card">
+                <h2>Escrow Details</h2>
 
-            {balance && <p>Escrow Balance: {balance} ETH</p>}
+                <div className="info-row">
+                    <span>Balance</span>
+                    <strong>
+                        {balance ? `${balance} ETH` : "Not checked"}
+                    </strong>
+                </div>
 
-            {escrowStatus && <p>Escrow Status: {escrowStatus}</p>}
+                <div className="info-row">
+                    <span>Status</span>
+                    <strong>
+                        {escrowStatus || "Not checked"}
+                    </strong>
+                </div>
+            </div>
 
-            <button onClick={releaseFunds}>
-                Release Funds
-            </button>
+            {escrowStatus && (
+                <div className="status-message">
+                    Escrow Status:{" "}
+                    <span
+                        className={`status-badge status-${[
+                            "Funded",
+                            "Released",
+                            "Refunded",
+                            "Created",
+                        ].includes(escrowStatus)
+                            ? escrowStatus.toLowerCase()
+                            : "unknown"
+                            }`}
+                    >
+                        {escrowStatus}
+                    </span>
+                </div>
+            )}
 
-            <button onClick={refundBuyer}>
-                Refund Funds
-            </button>
+            <div className="actions">
+                {escrowStatus && escrowStatus !== "Funded" && (
+                    <div className="action-info">
+                        🔒 Actions unavailable — this escrow is already{" "}
+                        {escrowStatus.toLowerCase()}.
+                    </div>
+                )}
+                <button onClick={getEscrowBalance}>
+                    Check Balance
+                </button>
 
-            {status && <p>Status: {status}</p>}
+                <button onClick={getEscrowStatus}>
+                    Check Status
+                </button>
+
+                <button
+                    onClick={releaseFunds}
+                    disabled={escrowStatus !== "Funded"}
+                    title={
+                        escrowStatus !== "Funded"
+                            ? "Funds can only be released while the escrow is funded"
+                            : "Release funds to the seller"
+                    }
+                >
+                    Release Funds
+                </button>
+
+                <button
+                    onClick={refundBuyer}
+                    disabled={escrowStatus !== "Funded"}
+                    title={
+                        escrowStatus !== "Funded"
+                            ? "Funds can only be refunded while the escrow is funded"
+                            : "Refund funds to the buyer"
+                    }
+                >
+                    Refund Funds
+                </button>
+            </div>
+
+            {status && (
+                <div className="status-message">
+                    {status}
+                </div>
+            )}
         </div>
     );
 }
